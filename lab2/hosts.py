@@ -1,10 +1,10 @@
-"""Student code for Lab/HW1.
+"""Student code for Lab 2.
 
     Run python autograder.py
 
-Author: Test Student
+Author: Joseph Isaacs
 Class: CSI-275-01
-Assignment: Lab/HW 1 -- Name of Assignment
+Assignment: Lab 2 -- Host Names and IP Addresses
 
 Certification of Authenticity:
 I certify that this is entirely my own work, except where I have given
@@ -16,8 +16,8 @@ assignment may, for the purpose of assessing this assignment:
 - service (which may then retain a copy of this assignment on its database for
 - the purpose of future plagiarism checking)
 
-Champlain College CSI-235, Spring 2019
 The following code was modified from Joshua Auerbach (jauerbach@champlain.edu)
+Champlain College CSI-235, Spring 2019
 Host class __init__ function by Jason Reeves 1/4/2021 (reeves@champlain.edu)
 """
 
@@ -46,7 +46,6 @@ def is_valid_ip_address(ip_address):
 
     look into split function
     """
-    #   *** YOUR CODE HERE ***
     split = str(ip_address).split(".", 4)  # one extra to test validity
 
     if len(split) != 4:
@@ -75,7 +74,6 @@ def is_valid_hostname(hostname):
     Returns:
         bool: True if hostname is valid, False otherwise.
     """
-    #   *** YOUR CODE HERE ***
     if not hostname:
         return False
 
@@ -171,7 +169,6 @@ class Hosts:
 
     def contains_entry(self, hostname):
         """Return whether or not a given hostname exists."""
-        #   *** YOUR CODE HERE ***
         return hostname in self.hostnames
 
     def get_ip(self, hostname):
@@ -182,7 +179,6 @@ class Hosts:
         """
         # self.ips and self.hostnames are parallel
 
-        #   *** YOUR CODE HERE ***
         if not self.hostnames.__contains__(hostname):
             return None
 
