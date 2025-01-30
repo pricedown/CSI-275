@@ -2,21 +2,38 @@
 
     Run python autograder.py
 
+Author: Test Student
+Class: CSI-275-01
+Assignment: Lab/HW 1 -- Name of Assignment
+
+Certification of Authenticity:
+I certify that this is entirely my own work, except where I have given
+fully-documented references to the work of others. I understand the definition
+and consequences of plagiarism and acknowledge that the assessor of this
+assignment may, for the purpose of assessing this assignment:
+- Reproduce this assignment and provide a copy to another member of academic
+- staff; and/or Communicate a copy of this assignment to a plagiarism checking
+- service (which may then retain a copy of this assignment on its database for
+- the purpose of future plagiarism checking)
+
 Champlain College CSI-235, Spring 2019
-The following code was written by Joshua Auerbach (jauerbach@champlain.edu)
+The following code was modified from Joshua Auerbach (jauerbach@champlain.edu)
 Host class __init__ function by Jason Reeves 1/4/2021 (reeves@champlain.edu)
 """
-import re
-
-from util import raise_not_defined
 
 
 class InvalidEntryError(Exception):
     """Exception raised for invalid entries in the hosts file."""
 
-    # Host names may contain only alphanumeric characters, minus signs ("-"), and periods ("."). They must begin with an alphabetic character and end with an alphanumeric character." Some examples include "localhost", "test-site3.com", and "www.champlain.edu
+    # Host names may contain only alphanumeric characters,
+    # minus signs ("-"), # and periods
+    # ("."). They must begin with an alphabetic character
+    # and end with an alphanumeric character
+    # Some examples include "localhost", "test-site3.com", and
+    # "www.champlain.edu
 
     pass
+
 
 def is_valid_ip_address(ip_address):
     """Return whether the given ip_address is a valid IPv4 address or not.
@@ -29,9 +46,8 @@ def is_valid_ip_address(ip_address):
 
     look into split function
     """
-
     #   *** YOUR CODE HERE ***
-    split = str(ip_address).split(".", 4) # one extra to test validity
+    split = str(ip_address).split(".", 4)  # one extra to test validity
 
     if len(split) != 4:
         print("Not 4 octets")
@@ -45,6 +61,7 @@ def is_valid_ip_address(ip_address):
 
     return True
 
+
 def is_valid_hostname(hostname):
     """Return whether the given hostname is valid or not.
 
@@ -57,10 +74,7 @@ def is_valid_hostname(hostname):
 
     Returns:
         bool: True if hostname is valid, False otherwise.
-
-
     """
-
     #   *** YOUR CODE HERE ***
     if not hostname:
         return False
@@ -73,6 +87,7 @@ def is_valid_hostname(hostname):
             return False
 
     return True
+
 
 class Hosts:
     """The Hosts class handles translating hostnames to ip addresses."""
@@ -98,7 +113,6 @@ class Hosts:
         self.hostnames[0] = 'localhost' and
         self.ips[0] = '127.0.0.1'.
         """
-
         f = open(hosts_file, "r")
 
         self.ips = []
@@ -157,7 +171,6 @@ class Hosts:
 
     def contains_entry(self, hostname):
         """Return whether or not a given hostname exists."""
-
         #   *** YOUR CODE HERE ***
         return hostname in self.hostnames
 
@@ -167,7 +180,6 @@ class Hosts:
         If the hostname does not exist in the file,
         None is returned.
         """
-
         # self.ips and self.hostnames are parallel
 
         #   *** YOUR CODE HERE ***
