@@ -186,5 +186,4 @@ class Hosts:
         if not self.hostnames.__contains__(hostname):
             return None
 
-        index = self.hostnames.index(hostname)
-        return self.ips[index]
+        return self.ips[self.hostnames.index(hostname)]
