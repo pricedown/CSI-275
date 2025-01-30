@@ -6,6 +6,7 @@ Champlain College CSI-235, Spring 2019
 The following code was written by Joshua Auerbach (jauerbach@champlain.edu)
 Host class __init__ function by Jason Reeves 1/4/2021 (reeves@champlain.edu)
 """
+import re
 
 from util import raise_not_defined
 
@@ -14,8 +15,8 @@ class InvalidEntryError(Exception):
     """Exception raised for invalid entries in the hosts file."""
 
     # Host names may contain only alphanumeric characters, minus signs ("-"), and periods ("."). They must begin with an alphabetic character and end with an alphanumeric character." Some examples include "localhost", "test-site3.com", and "www.champlain.edu
-    pass
 
+    pass
 
 def is_valid_ip_address(ip_address):
     """Return whether the given ip_address is a valid IPv4 address or not.
@@ -30,11 +31,10 @@ def is_valid_ip_address(ip_address):
     """
 
     #   *** YOUR CODE HERE ***
+    split = str(ip_address).split(".", 4) # one extra to test validity
 
-    split = ip_address.split(".", 4) # one extra to test validity
-
-    if len(split) > 4:
-        print("More than 4 octets")
+    if len(split) != 4:
+        print("Not 4 octets")
         return False
 
     for octet in split:
@@ -60,9 +60,19 @@ def is_valid_hostname(hostname):
 
 
     """
-    #   *** YOUR CODE HERE ***
-    raise_not_defined()
 
+    #   *** YOUR CODE HERE ***
+    if not hostname:
+        return False
+
+    if (not hostname[0].isalpha()) or (not hostname[-1].isalnum()):
+        return False
+
+    for char in hostname:
+        if not (char.isalnum() or char in "-."):
+            return False
+
+    return True
 
 class Hosts:
     """The Hosts class handles translating hostnames to ip addresses."""
@@ -88,6 +98,7 @@ class Hosts:
         self.hostnames[0] = 'localhost' and
         self.ips[0] = '127.0.0.1'.
         """
+
         f = open(hosts_file, "r")
 
         self.ips = []
@@ -147,9 +158,8 @@ class Hosts:
     def contains_entry(self, hostname):
         """Return whether or not a given hostname exists."""
 
-        # self.hostnames
         #   *** YOUR CODE HERE ***
-        raise_not_defined()
+        return hostname in self.hostnames
 
     def get_ip(self, hostname):
         """Return the IP for a given hostname.
@@ -161,4 +171,8 @@ class Hosts:
         # self.ips and self.hostnames are parallel
 
         #   *** YOUR CODE HERE ***
-        raise_not_defined()
+        if not self.hostnames.__contains__(hostname):
+            return None
+
+        index = self.hostnames.index(hostname)
+        return self.ips[index]
