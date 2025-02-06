@@ -16,6 +16,8 @@ assignment may, for the purpose of assessing this assignment:
 """
 import socket
 
+from Tools.scripts.var_access_benchmark import read_classvar_from_instance
+
 
 def build_list():
     lst = []
@@ -30,25 +32,51 @@ def build_list():
         except ValueError:
             print("Please only input a number")
 
-def sort_list(unsortedList):
-    msg = "LIST "
-    for n in unsortedList:
-        msg += str(n) + " "
-    data = msg.encode("ascii")
+def create_sorting_request(lst):
+    sent_message = "LIST"
+    for element in lst:
+        sent_message += " " + str(element)
+    return sent_message
 
-    print(f"Input: {msg}")
+def exchange_sort_server(request):
+    # Initialize connection
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     address = ("159.203.166.188", 7778)
     sock.connect(address)
-    sock.send(data)
 
-    data = sock.recv(1024)
-    print("Received from server:", data.decode())
+    # Send & Receive list
+    sock.send(request.encode("ascii"))
+    received_message = sock.recv(4096).decode()
 
     sock.close()
-            
+    return received_message
+
+class SortingServerError(Exception):
+    pass
+
+def parse_sorted_list(response):
+    result = []
+    split_message = response.split(" ")
+    for word in split_message:
+        if word == "ERROR:":
+            raise SortingServerError(response)
+        if word == "SORTED":
+            continue
+        result.append(float(word))
+
+    return result
+
+def sort_list(unsorted_list):
+    sort_request = create_sorting_request(unsorted_list)
+    print("Sending to server:", sort_request)
+
+    sorted_response = exchange_sort_server(sort_request)
+    print("Received from server:", sorted_response)
+
+    return parse_sorted_list(sorted_response)
+
 if __name__ == '__main__':
     print("Add numbers to a list to sort (type 'done' to quit)")
-    list = build_list()
-    sort_list(list)
-    print(f"Sorted numbers: {list}")
+    built_list = build_list()
+    sorted_list = sort_list(built_list)
+    print("Sorted numbers:", sorted_list)
