@@ -18,6 +18,11 @@ import socket
 
 
 def build_list():
+    """Prompts the user to build a list of numbers
+
+    Returns:
+        The list built by the user
+    """
     lst = []
     while True:
         number = input("Append number: ")
@@ -32,6 +37,11 @@ def build_list():
 
 
 def create_sorting_request(lst):
+    """Creates the string for a request to the sorting server
+
+    Returns:
+        The string that gets sent to the server
+    """
     sent_message = "LIST"
     for element in lst:
         sent_message += " " + str(element)
@@ -39,6 +49,12 @@ def create_sorting_request(lst):
 
 
 def exchange_sort_server(request):
+    """Uses TCP to send the request to the server and gets a response
+
+    Returns:
+        The received string from the server
+    """
+
     # Initialize connection
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     address = ("159.203.166.188", 7778)
@@ -57,6 +73,12 @@ class SortingServerError(Exception):
 
 
 def parse_sorted_list(response):
+    """Constructs a list from the sorting server's response message
+
+    Returns:
+        The sorted list given by the server
+    """
+
     result = []
     split_message = response.split(" ")
     for word in split_message:
@@ -70,6 +92,11 @@ def parse_sorted_list(response):
 
 
 def sort_list(unsorted_list):
+    """Sorts a list by using the sorting server
+
+    Returns:
+        The sorted list
+    """
     sort_request = create_sorting_request(unsorted_list)
     print("Sending to server:", sort_request)
 
