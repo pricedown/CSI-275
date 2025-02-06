@@ -16,27 +16,27 @@ assignment may, for the purpose of assessing this assignment:
 """
 import socket
 
-from Tools.scripts.var_access_benchmark import read_classvar_from_instance
-
 
 def build_list():
     lst = []
     while True:
         number = input("Append number: ")
-        
+
         if number.lower() == "done":
             return lst
-        
-        try: 
+
+        try:
             lst.append(float(number))
         except ValueError:
             print("Please only input a number")
+
 
 def create_sorting_request(lst):
     sent_message = "LIST"
     for element in lst:
         sent_message += " " + str(element)
     return sent_message
+
 
 def exchange_sort_server(request):
     # Initialize connection
@@ -51,8 +51,10 @@ def exchange_sort_server(request):
     sock.close()
     return received_message
 
+
 class SortingServerError(Exception):
     pass
+
 
 def parse_sorted_list(response):
     result = []
@@ -66,6 +68,7 @@ def parse_sorted_list(response):
 
     return result
 
+
 def sort_list(unsorted_list):
     sort_request = create_sorting_request(unsorted_list)
     print("Sending to server:", sort_request)
@@ -74,6 +77,7 @@ def sort_list(unsorted_list):
     print("Received from server:", sorted_response)
 
     return parse_sorted_list(sorted_response)
+
 
 if __name__ == '__main__':
     print("Add numbers to a list to sort (type 'done' to quit)")
