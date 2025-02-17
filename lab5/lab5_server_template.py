@@ -6,7 +6,7 @@ HOST = "localhost"
 PORT = 20000
 
 class InvalidSortingRequest(Exception):
-    """Invalid sorting request received by server"""
+    """Invalid sorting request received by server."""
     def __init__(self, msg="Invalid sorting request"):
         self.msg = msg
         super().__init__(msg)
@@ -39,7 +39,7 @@ class SortServer:
         code = 'a'
         if len(message_and_code) > 1:
             code = message_and_code[1]
-        if code != 'a' and code != 'd' and code != 's':
+        if code not in ('a', 'd', 's'):
             raise InvalidSortingRequest(f"Code is invalid: {code}")
 
         split_message = message_and_code[0].split(" ")
@@ -51,15 +51,14 @@ class SortServer:
         for str_num in split_message[1::]:
             try:
                 num = float(str_num)
-            except ValueError:
-                raise InvalidSortingRequest(f"Could not parse {str_num} into a number")
-            else:
-                result.append(num)
+            except ValueError as exc:
+                raise InvalidSortingRequest(f"Could not parse {str_num} into a number") from exc
+            result.append(num)
 
         return result, code
 
 
-    def construct_sorted_response(self, sorted_list, code):
+    def construct_sorted_response(self, sorted_list):
         """Construct outgoing message string from sorted list.
 
         :param sorted_list: List
@@ -75,27 +74,29 @@ class SortServer:
 
 
     def sorted_list(self, unsorted_list, code):
+        """Sorts list in
+
+        :param unsorted_list: The unsorted list
+        :param code: The code for how to sort the list
+        :return: The sorted list
+        """
         if code == 'a':
             return sorted(unsorted_list)
-        elif code == 'd':
+        if code == 'd':
             return sorted(unsorted_list, reverse=True)
-        elif code == 's':
+        if code == 's':
             string_list = [str(number) for number in unsorted_list]
             return sorted(string_list)
-        else:
-            raise InvalidSortingRequest(f"Code is invalid: {code}")
+        raise InvalidSortingRequest(f"Code is invalid: {code}")
 
 
     def run_server(self):
-        """Accept client connections to sort the lists they send
-
-        :return:
-        """
+        """Accept client connections to sort the lists they send."""
 
         self.tcp_socket.listen(20) # Backlog of 20 connections
 
         while True:
-            connection, addr = self.tcp_socket.accept()
+            connection, _ = self.tcp_socket.accept()
             while True:
                 try:
                     msg = connection.recv(4096).decode('ascii')
@@ -110,7 +111,7 @@ class SortServer:
                     print(e.msg)
                 else:
                     sorted_list = self.sorted_list(unsorted_list, code)
-                    response = self.construct_sorted_response(sorted_list, code)
+                    response = self.construct_sorted_response(sorted_list)
                 connection.send(response.encode('ascii'))
 
 
