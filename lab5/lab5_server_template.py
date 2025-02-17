@@ -112,7 +112,7 @@ class SortServer:
                 else:
                     sorted_list = self.sorted_list(unsorted_list, code)
                     response = self.construct_sorted_response(sorted_list)
-                connection.send(response.encode('ascii'))
+                connection.sendall(response.encode('ascii'))
 
 
 if __name__ == "__main__":
