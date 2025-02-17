@@ -8,6 +8,7 @@ PORT = 20000
 class InvalidSortingRequest(Exception):
     """Invalid sorting request received by server"""
     def __init__(self, msg="Invalid sorting request"):
+        self.msg = msg
         super().__init__(msg)
 
 class SortServer:
@@ -30,10 +31,18 @@ class SortServer:
         """Parse incoming unsorted message into a list.
 
         :param request: String message received from server
-        :return: List of unsorted numbers (floats)
+        :return: List of unsorted numbers (floats), and the code of sort type
         """
         result = []
-        split_message = request.split(" ")
+
+        message_and_code = request.split("|")
+        code = 'a'
+        if len(message_and_code) > 1:
+            code = message_and_code[1]
+        if code != 'a' and code != 'd' and code != 's':
+            raise InvalidSortingRequest(f"Code is invalid: {code}")
+
+        split_message = message_and_code[0].split(" ")
         if len(split_message) < 2:
             raise InvalidSortingRequest(f"'{request}' is not a list of items separated by spaces")
         if split_message[0] != "LIST":
@@ -47,9 +56,10 @@ class SortServer:
             else:
                 result.append(num)
 
-        return result
+        return result, code
 
-    def construct_sorted_response(self, sorted_list):
+
+    def construct_sorted_response(self, sorted_list, code):
         """Construct outgoing message string from sorted list.
 
         :param sorted_list: List
@@ -57,9 +67,23 @@ class SortServer:
         """
         result = "SORTED"
         for num in sorted_list:
-            result += f" {num:g}"
+            try:
+                result += f" {float(num):g}"
+            except ValueError:
+                result += f" {num}"
         return result
 
+
+    def sorted_list(self, unsorted_list, code):
+        if code == 'a':
+            return sorted(unsorted_list)
+        elif code == 'd':
+            return sorted(unsorted_list, reverse=True)
+        elif code == 's':
+            string_list = [str(number) for number in unsorted_list]
+            return sorted(string_list)
+        else:
+            raise InvalidSortingRequest(f"Code is invalid: {code}")
 
 
     def run_server(self):
@@ -72,19 +96,22 @@ class SortServer:
 
         while True:
             connection, addr = self.tcp_socket.accept()
-            msg = connection.recv(4096).decode('ascii')
+            while True:
+                try:
+                    msg = connection.recv(4096).decode('ascii')
+                except ConnectionAbortedError:
+                    print("Connection aborted")
+                    break
 
-            try:
-                unsorted_list = self.parse_unsorted_request(msg)
-            except InvalidSortingRequest:
-                response = "ERROR"
-            else:
-                sorted_list = sorted(unsorted_list)
-                response = self.construct_sorted_response(sorted_list)
-
-            connection.sendall(response.encode('ascii'))
-
-
+                try:
+                    unsorted_list, code = self.parse_unsorted_request(msg)
+                except InvalidSortingRequest as e:
+                    response = "ERROR"
+                    print(e.msg)
+                else:
+                    sorted_list = self.sorted_list(unsorted_list, code)
+                    response = self.construct_sorted_response(sorted_list, code)
+                connection.send(response.encode('ascii'))
 
 
 if __name__ == "__main__":
