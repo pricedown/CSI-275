@@ -36,9 +36,13 @@ def build_list():
     return unsorted_list
 
 def sort_list(unsorted_list):
-    """Put your docstring here."""
-    # YOUR SOCKET CODE GOES HERE!
-    pass
+    """
+
+    :param unsorted_list: The unsorted list
+    :return:
+    """
+
+
 
 def main():
     """Call the build_list and sort_list functions, and print the result."""
