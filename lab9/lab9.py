@@ -2,6 +2,7 @@
 """
 import json
 import socket
+import zlib
 
 
 def build_list():
@@ -54,10 +55,14 @@ def sort_list(unsorted_list):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     addr = ('localhost', 7778)
     sock.connect(addr)
-    sock.sendall(json_list.encode('utf-8'))
-    received = sock.recv(4096)
+    uncompressed_message = json_list.encode('utf-8')
+    compressed_message = zlib.compress(uncompressed_message, 6)
+    print(f"Uncompressed message len: {len(uncompressed_message)}")
+    print(f"Compressed message len: {len(compressed_message)}")
+    sock.sendall(compressed_message)
 
     # Reconstructed list from JSON
+    received = sock.recv(4096)
     received_list = json.loads(received.decode('utf-8'))
     print(received_list)
     sock.close()
@@ -69,4 +74,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

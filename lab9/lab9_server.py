@@ -8,14 +8,15 @@ Assignment: Lab/HW 9 - JSON Client/Server
 
 """
 
-from socket import *
+import socket
 import _thread
-import time, datetime
+import zlib
+import time
+import datetime
 import json
 
 HOST = 'localhost'  # IP of server
 PORT = 7778         # Port of server
-
 
 def handler(client_socket, addr):
     """Handler function for socket connections.
@@ -31,7 +32,7 @@ def handler(client_socket, addr):
             break
 
         # Decode the data into a list
-        data_list = json.loads(data.decode('utf-8'))
+        data_list = json.loads(zlib.decompress(data).decode('utf-8'))
 
         # Get time of connection
         now = datetime.datetime.now().timestamp()
@@ -46,21 +47,19 @@ def handler(client_socket, addr):
         if len(data_list) == 0:
             print("Data list is empty")
             is_error = True
-
-        if not is_error:
+        else:
             sort_mode = data_list[0]
             if sort_mode not in [ 'a', 'd', 's' ]:
                 is_error = True
 
-        if not is_error:
-            data_list = data_list[1:]
-            for element in data_list:
-                try:
-                    # This will allow numeric data through
-                    float(element)
-                except ValueError:  # Data is non-numeric
-                    print("Value Error")
-                    is_error = True
+        data_list = data_list[1:]
+        for element in data_list:
+            try:
+                # This will allow numeric data through
+                float(element)
+            except ValueError:  # Data is non-numeric
+                print("Value Error")
+                is_error = True
 
         return_data = ""
         if not is_error:
@@ -83,11 +82,11 @@ def handler(client_socket, addr):
 
 
 if __name__ == "__main__":
-    sock = socket(AF_INET, SOCK_STREAM)
-    sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((HOST, PORT))
     sock.listen(20)
 
     while 1:
-        client_sock, addr = sock.accept()
-        _thread.start_new_thread(handler, (client_sock, addr))
+        client_sock, address = sock.accept()
+        _thread.start_new_thread(handler, (client_sock, address))
