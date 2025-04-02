@@ -12,12 +12,14 @@ def build_list():
     #Create a list to store our numbers
     unsorted_list = []
 
-    # Create a variable for input
-    user_input = ""
+    # Collect sorting mode
+    print("Sort modes: 'a': ascending, 'd': descending, 's' alphabetically")
+    user_input = input("Please enter the sorting mode: ")
+    unsorted_list.append(user_input)
 
     while user_input != "done":
         # Prompt the user for input
-        user_input = input("Please enter a number, or 'done' to stop.")
+        user_input = input("Please enter a number, or 'done' to stop: ")
 
         # Validate our input, and add it to out list
         # if it's a number
@@ -31,7 +33,7 @@ def build_list():
             except ValueError:
                 # Non-numeric input - if it's not "done",
                 # reject it and move on
-                if (user_input != "done"):
+                if user_input != "done":
                     print ("ERROR: Non-numeric input provided.")
                 continue
 

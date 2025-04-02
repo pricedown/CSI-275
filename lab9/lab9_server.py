@@ -2,6 +2,7 @@
 
 Author: Duane Dunston (original author)
 Author: Jason Reeves (modified code for CSI-275)
+Author: Joseph Isaacs (modified code again for CSI-275)
 Class: CSI-275-01/02
 Assignment: Lab/HW 9 - JSON Client/Server
 
@@ -41,18 +42,35 @@ def handler(client_socket, addr):
 
         # Validate data
         is_error = False
-        for element in data_list:
-            try:
-                # This will allow numeric data through
-                float(element)
-            except ValueError:  # Data is non-numeric
-                print("Value Error")
+
+        if len(data_list) == 0:
+            print("Data list is empty")
+            is_error = True
+
+        if not is_error:
+            sort_mode = data_list[0]
+            if sort_mode not in [ 'a', 'd', 's' ]:
                 is_error = True
+
+        if not is_error:
+            data_list = data_list[1:]
+            for element in data_list:
+                try:
+                    # This will allow numeric data through
+                    float(element)
+                except ValueError:  # Data is non-numeric
+                    print("Value Error")
+                    is_error = True
 
         return_data = ""
         if not is_error:
             # Sort data
-            data_list.sort()
+            if sort_mode == 'a':
+                data_list.sort(reverse=True)
+            elif sort_mode == 'd':
+                data_list.sort()
+            elif sort_mode == 's':
+                data_list.sort(key=str)
 
             # Return the data to the client
             return_data = json.dumps(data_list)
