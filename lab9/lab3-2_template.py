@@ -1,5 +1,8 @@
-"""Don't forget your docstrings!
+"""A client to the JSON sorting server
 """
+import json
+import socket
+
 
 def build_list():
     """Collect input from the user and return it as a list.
@@ -36,13 +39,26 @@ def build_list():
     return unsorted_list
 
 def sort_list(unsorted_list):
-    """
+    """Sort list and send it back to the server
 
     :param unsorted_list: The unsorted list
     :return:
     """
 
+    # Transform list into JSON object
+    json_list = json.dumps(unsorted_list)
 
+    # Create a socket and connect to port 7778 on localhost
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    addr = ('localhost', 7778)
+    sock.connect(addr)
+    sock.sendall(json_list.encode('utf-8'))
+    received = sock.recv(4096)
+
+    # Reconstructed list from JSON
+    received_list = json.loads(received.decode('utf-8'))
+    print(received_list)
+    sock.close()
 
 def main():
     """Call the build_list and sort_list functions, and print the result."""

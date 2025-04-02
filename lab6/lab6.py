@@ -21,6 +21,7 @@ class LengthServer:
         :param length:  length of data to collect
         :return: the data collected
         """
+
         data = b""
         while len(data) < length:
             packet = conn.recv(length - len(data))
@@ -31,8 +32,8 @@ class LengthServer:
 
     def calc_length(self):
         """Receives a length-prefixed message and responds verifying its length"""
-        self.sock.listen()
 
+        self.sock.listen()
         while True:
             connection, _ = self.sock.accept()
 
