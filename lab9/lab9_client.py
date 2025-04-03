@@ -1,9 +1,15 @@
 """A client to the JSON sorting server
+
+Author: Joseph Isaacs
+Class: CSI-275-01
+Assignment: Lab/HW 9 - JSON Client/Server
+Date: 04/03/2025
+
 """
+
 import json
 import socket
 import zlib
-
 
 def build_list():
     """Collect input from the user and return it as a list.
