@@ -14,7 +14,7 @@ def build_list():
     unsorted_list = []
 
     # Collect sorting mode
-    print("Sort modes: 'a': ascending, 'd': descending, 's' alphabetically")
+    print("Sort modes: 'a': ascending, 'd': descending, 's': alphabetically")
     user_input = input("Please enter the sorting mode: ")
     unsorted_list.append(user_input)
 
@@ -42,10 +42,9 @@ def build_list():
     return unsorted_list
 
 def sort_list(unsorted_list):
-    """Sort list and send it back to the server
+    """Prints sorted list by exchanging with a TCP server
 
-    :param unsorted_list: The unsorted list
-    :return:
+    Uses JSON objects and zlib compression
     """
 
     # Transform list into JSON object
