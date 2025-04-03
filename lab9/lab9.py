@@ -51,7 +51,7 @@ def sort_list(unsorted_list):
     # Transform list into JSON object
     json_list = json.dumps(unsorted_list)
 
-    # Create a socket and connect to port 7778 on localhost
+    # Create a socket and send compressed data
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     addr = ('localhost', 7778)
     sock.connect(addr)
@@ -61,9 +61,9 @@ def sort_list(unsorted_list):
     print(f"Compressed message len: {len(compressed_message)}")
     sock.sendall(compressed_message)
 
-    # Reconstructed list from JSON
+    # Reconstruct sorted list reply from JSON
     received = sock.recv(4096)
-    received_list = json.loads(received.decode('utf-8'))
+    received_list = json.loads(zlib.decompress(received).decode('utf-8'))
     print(received_list)
     sock.close()
 

@@ -65,9 +65,9 @@ def handler(client_socket, addr):
         if not is_error:
             # Sort data
             if sort_mode == 'a':
-                data_list.sort(reverse=True)
-            elif sort_mode == 'd':
                 data_list.sort()
+            elif sort_mode == 'd':
+                data_list.sort(reverse=True)
             elif sort_mode == 's':
                 data_list.sort(key=str)
 
@@ -78,7 +78,7 @@ def handler(client_socket, addr):
 
         # Send our response, whatever it may be
         print(f"Returning {return_data} to the client")
-        client_socket.sendall(return_data.encode('utf-8'))
+        client_socket.sendall(zlib.compress(return_data.encode('utf-8'),6))
 
 
 if __name__ == "__main__":
