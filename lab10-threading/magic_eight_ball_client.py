@@ -71,6 +71,7 @@ def recv_until_delimiter(delim_sock, byte_delim, storage):
 
                 # Return the message + delimiter and the storage buffer
                 return data, storage
+    return None
 
 
 def question_handler(handler_sock, num_qs, preamble):

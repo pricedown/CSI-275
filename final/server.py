@@ -52,7 +52,7 @@ def recv_socket_thread():
     sock.listen()
     while True:
         conn, _ = sock.accept()
-        threading.Thread(target=handle_send_client, args=(conn,), daemon=True).start()
+        threading.Thread(target=handle_send_client, args=(conn,), daemon=False).start()
 
 def send_socket_thread():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -61,8 +61,8 @@ def send_socket_thread():
     sock.listen()
     while True:
         conn, _ = sock.accept()
-        threading.Thread(target=handle_recv_client, args=(conn,), daemon=True).start()
+        threading.Thread(target=handle_recv_client, args=(conn,), daemon=False).start()
 
 if __name__ == "__main__":
-    threading.Thread(target=recv_socket_thread, daemon=True).start()
+    threading.Thread(target=recv_socket_thread, daemon=False).start()
     send_socket_thread()
