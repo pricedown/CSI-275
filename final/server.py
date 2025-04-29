@@ -1,3 +1,5 @@
+"""A threaded server for a chat program operating over TCP sockets."""
+
 import socket
 import threading
 import json
@@ -13,11 +15,16 @@ def recvall(conn, length):
 
     data = b''
     while len(data) < length:
-        more = conn.recv(length - len(data))
-        if not more:
-            return data
-        data += more
+        try:
+            more = conn.recv(length - len(data))
+            if not more:
+                return data
+            data += more
+        except ConnectionResetError:
+            return None
+
     return data
+
 
 def send_json(sock, data):
     """Sends length-prefixed data as a json object encoded in utf-8."""
@@ -26,27 +33,41 @@ def send_json(sock, data):
     length = len(encoded).to_bytes(4, 'big')
     sock.sendall(length + encoded)
 
+def recv_json(sock):
+    """Returns received length-prefixed json object encoded with utf-8."""
+
+    raw_len = recvall(sock, 4)
+    if not raw_len:
+        return None
+
+    msg_len = int.from_bytes(raw_len, 'big')
+    msg_data = recvall(sock, msg_len)
+    msg = json.loads(msg_data.decode('utf-8'))
+    return msg
+
 def serve_chatter(conn):
     """Receives messages from a chat client and relays them to other clients."""
 
     while True:
-        raw_len = recvall(conn, 4)
-        if not raw_len:
-            break
-
-        msg_len = int.from_bytes(raw_len, 'big')
-        msg_data = recvall(conn, msg_len)
-        msg = json.loads(msg_data.decode('utf-8'))
+        msg = recv_json(conn)
 
         if not msg:
-            continue
+            break
 
         msg_type = msg[0]
+
+        if msg_type == "EXIT":
+            sender = msg[1]
+            if sender in clients:
+                clients[sender].close()
+                del clients[sender]
+                print(f"{sender} has disconnected.")
+            break
 
         if msg_type == "BROADCAST":
             sender, text = msg[1], msg[2]
             print(f"[BROADCAST] {sender}: {text}")
-            for user, sock in clients.items():
+            for _, sock in clients.items():
                 send_json(sock, ["BROADCAST", sender, text])
 
         elif msg_type == "PRIVATE":
@@ -58,13 +79,6 @@ def serve_chatter(conn):
                 if sender in clients:
                     send_json(clients[sender], ["SERVER", f"User '{recipient}' not found."])
 
-        elif msg_type == "EXIT":
-            sender = msg[1]
-            if sender in clients:
-                clients[sender].close()
-                del clients[sender]
-                print(f"{sender} has disconnected.")
-            break
     conn.close()
 
 def register_listener(conn):
@@ -85,6 +99,7 @@ def accept_sending_clients():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind((HOST, PORT_RECV))
+
     sock.listen()
     print(f"Listening for sender clients on port {PORT_RECV}")
     while True:
@@ -92,16 +107,17 @@ def accept_sending_clients():
         threading.Thread(target=serve_chatter, args=(conn,), daemon=False).start()
 
 def accept_receiving_clients():
-    """Continuously spawns threads to register new receiving clients."""
+    """Continuously registers new receiving clients."""
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((HOST, PORT_SEND))
+
     sock.listen()
     print(f"Listening for receiving clients on port {PORT_SEND}")
     while True:
         conn, _ = sock.accept()
-        threading.Thread(target=register_listener, args=(conn,), daemon=False).start()
+        register_listener(conn)
 
 if __name__ == "__main__":
     threading.Thread(target=accept_sending_clients, daemon=False).start()

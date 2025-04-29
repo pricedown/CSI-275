@@ -1,4 +1,4 @@
-# A threaded client for a chat program operating over TCP sockets.
+"""A threaded client for a chat program operating over TCP sockets."""
 
 import socket
 import threading
@@ -41,6 +41,7 @@ def recv_json(sock):
 
 def recv_forever(sock):
     """Receives json messages in a loop."""
+
     while True:
         msg = recv_json(sock)
         if not msg:
@@ -53,22 +54,25 @@ def recv_forever(sock):
         elif msg[0] == "SERVER":
             print(f"[Server]: {msg[1]}")
 
-def send_forever(sock, username):
+def send_forever(sock, user_name):
     """Sends json messages in a loop."""
 
     while True:
         msg = input()
         if msg == "!exit":
-            send_json(sock, ["EXIT", username])
+            send_json(sock, ["EXIT", user_name])
             break
         if msg.startswith("@"):
-            # TODO: maybe try and catch invalid format
-            parts = msg.split(' ', 1)
-            recipient = parts[0][1:]
-            message = parts[1]
-            send_json(sock, ["PRIVATE", username, message, recipient])
+            try:
+                parts = msg.split(' ', 1)
+                recipient = parts[0][1:]
+                message = parts[1]
+                send_json(sock, ["PRIVATE", user_name, message, recipient])
+            except IndexError:
+                print("Usage: @[user] [message]")
+                continue
         else:
-            send_json(sock, ["BROADCAST", username, msg])
+            send_json(sock, ["BROADCAST", user_name, msg])
 
 def pick_username():
     """Prompts user to select their name."""
